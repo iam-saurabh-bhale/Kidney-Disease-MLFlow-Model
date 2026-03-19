@@ -74,6 +74,7 @@ Option B: Kubernetes Job (Cluster Execution)
 
 Note : I have taken the help from the Google Gemini and ChatGPT as code is having multiple issue in deployment. Also while trying to sort issue once common issue occured related to Dockerize model not able to locate the MLFlow resources.
 <img width="889" height="91" alt="image" src="https://github.com/user-attachments/assets/6637d5e1-f257-461d-917a-67671962f11c" />
+<img width="1343" height="999" alt="image" src="https://github.com/user-attachments/assets/fa89a454-dc64-4f91-94e2-87a2cb90deee" />
 
-    <img width="1862" height="507" alt="image" src="https://github.com/user-attachments/assets/1c1b3a64-69cd-41c5-9c72-f6f2d009443c" /><img width="1233" height="442" alt="image" src="https://github.com/user-attachments/assets/c3f9a63c-466d-444b-864b-36f2a29f8584" />
+ <img width="1862" height="507" alt="image" src="https://github.com/user-attachments/assets/1c1b3a64-69cd-41c5-9c72-f6f2d009443c" /><img width="1233" height="442" alt="image" src="https://github.com/user-attachments/assets/c3f9a63c-466d-444b-864b-36f2a29f8584" />
 
