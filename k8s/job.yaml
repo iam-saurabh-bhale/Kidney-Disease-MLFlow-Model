@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kidney-training-pod
+spec:
+  template:
+    spec:
+      containers:
+      - name: trainer
+        image: kidney-trainer:latest
+        imagePullPolicy: Never
+        env:
+        - name: MLFLOW_TRACKING_URI
+          value: "http://mlflow.mlflow.svc.cluster.local:80"
+        volumeMounts:
+        - name: data-vol
+          mountPath: /mnt/data
+      volumes:
+      - name: data-vol
+        hostPath:
+          path: /home/saurabhbhale/kra/Kidney-Disease-MLFlow-Model/data
+      restartPolicy: Never

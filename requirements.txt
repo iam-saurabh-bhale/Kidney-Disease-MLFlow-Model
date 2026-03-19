@@ -1,0 +1,4 @@
+mlflow
+tensorflow
+numpy
+psycopg2-binary
