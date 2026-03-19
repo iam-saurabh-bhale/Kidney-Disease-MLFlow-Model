@@ -13,10 +13,12 @@ This repository contains a Deep Learning pipeline to classify kidney CT scans in
 
 2. Infrastructure Setup (Choose One)
 Option A: Standard Kubernetes Manifests
-Bash
+
+```
 
 kubectl create namespace mlflow
 kubectl apply -f k8s/mlflow-deployment.yaml -n mlflow
+```
 
 Option B: Helm (Recommended for Production)
 
