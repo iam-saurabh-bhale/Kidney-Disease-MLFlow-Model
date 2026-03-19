@@ -1,126 +1,79 @@
-# Kidney-Disease-MLFlow-Model
-
-
 Kidney Disease Classification with MLflow & Kubernetes
 1. Project Overview
 
-This repository contains a Deep Learning pipeline for Kidney CT scan classification.
+This repository contains a Deep Learning pipeline to classify kidney CT scans into Normal or Tumor categories.
 
     Model: CNN (TensorFlow/Keras)
 
     Tracking: MLflow (hosted on Kubernetes)
 
+    Orchestration: Kubernetes Jobs & Helm
+
     Environment: Minikube
 
-2. MLflow Infrastructure Setup
-
-The MLflow server acts as a central hub for all training metrics, parameters, and model versions.
-Step 1: Deploy MLflow to Minikube
-
-We deploy MLflow using a NodePort service to make the UI accessible from the host machine.
+2. Infrastructure Setup (Choose One)
+Option A: Standard Kubernetes Manifests
 Bash
 
 kubectl create namespace mlflow
 kubectl apply -f k8s/mlflow-deployment.yaml -n mlflow
 
-Step 2: Identify the Tracking URI
+Option B: Helm (Recommended for Production)
 
-MLflow requires a specific URI to receive data.
+Using Helm allows for easier lifecycle management of the MLflow stack.
+Bash
 
-    External (Your Browser/Local Script): Use http://<minikube-ip>:<node-port>
+helm repo add community-charts https://community-charts.github.io/helm-charts
+helm repo update
 
-    Internal (Inside K8s Pods): Use http://mlflow.mlflow.svc.cluster.local:80
+# Install MLflow with NodePort enabled for local access
+helm install mlflow community-charts/mlflow \
+  --namespace mlflow \
+  --set service.type=NodePort \
+  --set service.nodePort=30758 \
+  --set backendStore.type=sqlite
 
-Step 3: Access the Dashboard
-
-Run minikube ip and kubectl get svc -n mlflow to find your coordinates.
-Example: http://192.168.49.2:30758
 3. Data & Permissions Strategy
 Step 1: Reclaim Folder Ownership
 
-If you encounter Permission Denied errors during git pull or file access, reset ownership:
+If you encounter Permission Denied errors (common after using sudo or docker), reset ownership:
 Bash
 
 sudo chown -R $USER:$USER .
 
-Step 2: Mount Training Data
+Step 2: Mount Training Data to Minikube
 
-MLflow needs data to train. Mount your local dataset into the Minikube VM so the cluster can see it:
+Since K8s pods cannot see your local drive directly, mount your data folder into the Minikube VM:
 Bash
 
+# Run this in a separate terminal and keep it open
 minikube mount $(pwd)/data:/mnt/data
 
-Note: Keep this terminal window open during training.
-4. Executing the MLflow Experiment
-Context: Handling Ephemeral Storage
+4. Training Execution
+Option A: Local Run (Directly on Laptop)
 
-By default, this setup uses sqlite:///:memory:. If the MLflow pod restarts, all previous experiment IDs are lost. To prevent RESOURCE_DOES_NOT_EXIST errors, always fetch the Experiment ID by Name in your script.
-Running the Training Script
-
-    Install Dependencies: pip install tensorflow mlflow
-
-    Execute:
-
+Ideal for rapid debugging before deploying to the cluster.
 Bash
 
-# Point to your Minikube MLflow instance
 export MLFLOW_TRACKING_URI="http://$(minikube ip):30758"
-
-# Force a fresh experiment name to avoid ID conflicts
-export MLFLOW_EXPERIMENT_NAME="Kidney_Scan_Run_$(date +%Y%m%d)"
-
+export MLFLOW_EXPERIMENT_NAME="Kidney_Local_$(date +%Y%m%d)"
 python3 train.py
 
+Option B: Kubernetes Job (Cluster Execution)
 
-# Kubernetes Orchestration (k8s)
+    Build the Image inside Minikube's Docker daemon:
+    Bash
 
-In a production-like flow, we don't run docker run manually. We use Kubernetes Jobs to handle the training logic. A Job is ideal for ML because it runs until the training is finished and then stops, releasing resources.
-Step 1: Build the Image for the Cluster
+    eval $(minikube docker-env)
+    docker build -t kidney-trainer:latest -f docker/Dockerfile .
 
-Before K8s can run your code, the image must be available to the Minikube nodes.
-Bash
+    Deploy the Job:
+    Bash
 
-# Point your terminal to Minikube's Docker daemon
-eval $(minikube docker-env)
+    kubectl apply -f k8s/job.yaml -n mlflow
 
-# Build the trainer image
-docker build -t kidney-trainer:latest -f docker/Dockerfile .
+Note : I have taken the help from the Google Gemini and ChatGPT as code is having multiple issue in deployment. Also while trying to sort issue once common issue occured related to Dockerize model not able to locate the MLFlow resources.
+<img width="889" height="91" alt="image" src="https://github.com/user-attachments/assets/6637d5e1-f257-461d-917a-67671962f11c" />
 
-Step 2: Configure the Job Manifest
+    <img width="1862" height="507" alt="image" src="https://github.com/user-attachments/assets/1c1b3a64-69cd-41c5-9c72-f6f2d009443c" /><img width="1233" height="442" alt="image" src="https://github.com/user-attachments/assets/c3f9a63c-466d-444b-864b-36f2a29f8584" />
 
-Ensure your k8s/job.yaml points to the internal Service DNS. This allows the Training Pod to find the MLflow Pod across the cluster.
-
-File: k8s/job.yaml (Key Snippet)
-YAML
-
-spec:
-  template:
-    spec:
-      containers:
-      - name: trainer
-        image: kidney-trainer:latest
-        imagePullPolicy: Never  # Vital: tells K8s to use the image we just built locally
-        env:
-        - name: MLFLOW_TRACKING_URI
-          value: "http://mlflow.mlflow.svc.cluster.local:80"
-        volumeMounts:
-        - name: data-vol
-          mountPath: /mnt/data
-      volumes:
-      - name: data-vol
-        hostPath:
-          path: /home/saurabhbhale/kra/Kidney-Disease-MLFlow-Model/data
-
-Step 3: Deploy the Training Job
-
-Run the job in the same namespace as MLflow to simplify networking.
-Bash
-
-kubectl apply -f k8s/job.yaml -n mlflow
-
-5. Reviewing Results in MLflow
-
-
-
-
-    
