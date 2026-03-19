@@ -21,10 +21,13 @@ kubectl apply -f k8s/mlflow-deployment.yaml -n mlflow
 Option B: Helm (Recommended for Production)
 
 Using Helm allows for easier lifecycle management of the MLflow stack.
+
+```
 Bash
 
 helm repo add community-charts https://community-charts.github.io/helm-charts
 helm repo update
+```
 
 # Install MLflow with NodePort enabled for local access
 ```
@@ -38,9 +41,10 @@ helm install mlflow community-charts/mlflow \
 Step 1: Reclaim Folder Ownership
 
 If you encounter Permission Denied errors (common after using sudo or docker), reset ownership:
-Bash
 
+```
 sudo chown -R $USER:$USER .
+```
 
 Step 2: Mount Training Data to Minikube
 
@@ -48,7 +52,11 @@ Since K8s pods cannot see your local drive directly, mount your data folder into
 Bash
 
 # Run this in a separate terminal and keep it open
+
+```
 minikube mount $(pwd)/data:/mnt/data
+```
+
 
 4. Training Execution
 Option A: Local Run (Directly on Laptop)
