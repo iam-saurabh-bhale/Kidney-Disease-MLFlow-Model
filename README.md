@@ -62,24 +62,26 @@ minikube mount $(pwd)/data:/mnt/data
 Option A: Local Run (Directly on Laptop)
 
 Ideal for rapid debugging before deploying to the cluster.
-Bash
 
+```
 export MLFLOW_TRACKING_URI="http://$(minikube ip):30758"
 export MLFLOW_EXPERIMENT_NAME="Kidney_Local_$(date +%Y%m%d)"
 python3 train.py
+```
 
 Option B: Kubernetes Job (Cluster Execution)
 
-    Build the Image inside Minikube's Docker daemon:
-    Bash
+Build the Image inside Minikube's Docker daemon:
 
-    eval $(minikube docker-env)
+   ```
+   eval $(minikube docker-env)
     docker build -t kidney-trainer:latest -f docker/Dockerfile .
 
     Deploy the Job:
     Bash
 
     kubectl apply -f k8s/job.yaml -n mlflow
+```
 
 Note : I have taken the help from the Google Gemini and ChatGPT as code is having multiple issue in deployment. Also while trying to sort issue once common issue occured related to Dockerize model not able to locate the MLFlow resources.
 <img width="889" height="91" alt="image" src="https://github.com/user-attachments/assets/6637d5e1-f257-461d-917a-67671962f11c" />
