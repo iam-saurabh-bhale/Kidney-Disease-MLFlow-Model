@@ -76,16 +76,13 @@ Option B: Kubernetes Job (Cluster Execution)
 Build the Image inside Minikube's Docker daemon:
 
    ```
-   eval $(minikube docker-env)
+    eval $(minikube docker-env)
     docker build -t kidney-trainer:latest -f docker/Dockerfile .
-
-    Deploy the Job:
-    Bash
-
     kubectl apply -f k8s/job.yaml -n mlflow
 ```
 
 Note : I have taken the help from the Google Gemini and ChatGPT as code is having multiple issue in deployment. Also while trying to sort issue once common issue occured related to Dockerize model not able to locate the MLFlow resources.
+
 <img width="889" height="91" alt="image" src="https://github.com/user-attachments/assets/6637d5e1-f257-461d-917a-67671962f11c" />
 <img width="1343" height="999" alt="image" src="https://github.com/user-attachments/assets/fa89a454-dc64-4f91-94e2-87a2cb90deee" />
 
