@@ -27,12 +27,13 @@ helm repo add community-charts https://community-charts.github.io/helm-charts
 helm repo update
 
 # Install MLflow with NodePort enabled for local access
+```
 helm install mlflow community-charts/mlflow \
   --namespace mlflow \
   --set service.type=NodePort \
   --set service.nodePort=30758 \
   --set backendStore.type=sqlite
-
+```
 3. Data & Permissions Strategy
 Step 1: Reclaim Folder Ownership
 
